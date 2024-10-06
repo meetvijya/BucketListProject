@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    ports:
+      - "3307:3306"
+    restart: always
+    environment:
+        MYSQL_ROOT_USER: root
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: bucketlist
+    volumes:
+      #- ./db-data:/var/lib/mysql #volume for mysql data on host machine
+      - ./Database:/docker-entrypoint-initdb.d/ #vol for initializing script
+    networks:
+      - my-network
+
+  app:
+    build: .
+    container_name: flask-app
+    depends_on:
+      - db
+    ports:
+      - "5001:5001"
+    networks:
+      - my-network
+
+networks: 
+  my-network:
+    driver: bridge
+
+
+

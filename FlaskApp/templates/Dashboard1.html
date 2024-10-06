@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>Python Flask Bucket List App</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src ="../static/js/jquery-3.3.1.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+ 
+   <link href="https://getbootstrap.com/docs/3.3/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css">
+ 
+ 
+    <link href="https://getbootstrap.com/docs/3.3/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+	 
+     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	 
+	 <script src="../static/js/csi.min.js" type="text/javascript"></script>
+	 <!-- <script type="text/html" src ="../templates/dashboard.html"></script> -->
+	 <script src="../static/js/jquery.ui.widget.js"></script>
+ 
+	<script type="text/javascript" src="../static/js/jquery.fileupload.js"></script>
+	 
+	<script type="text/javascript" src="../static/js/jquery.fileupload-process.js"></script>
+	 
+	<script type="text/javascript" src="../static/js/jquery.fileupload-ui.js"></script>
+<script>
+ $(function(){
+    $('#fileupload').fileupload({
+	    url:'uploadUserPhoto',
+	    dataType:'json',
+	    add: function(e,data){
+	         data.submit();},
+		success:function(response,status){
+		         console.log(response.filename);
+				 var filePath = 'static/UserPhoto/' + response.filename;
+					$('#imgUpload').attr('src',filePath);
+					$('#filePath').val(filePath);					
+			        console.log('success');
+			        }
+                 
+				 ,
+		error:function(error){
+				console.log(error);}
+        });
+		
+  <!-- Update User -->
+ $('#btnUserAccount').click(function(){
+              
+           $.ajax({
+             url : '/updateUser',
+             data: {
+					  name:$('#inputName').val(),
+					  username:$('#inputEmail').val(),
+					  password:$('#inputPassword').val(),
+					  userphoto:$('#imgUpload').attr('src'),
+					  
+				  },
+             type:'POST',
+             success: function(res){
+               $('#aboutMeModal').modal('hide');           
+               
+               },
+           error: function(error){
+            console.log(error);}
+        
+           });   
+       });  
+ });
+ 
+ <!-- Get all logged in user wishes-->
+$(document).ready(function() {
+     <!-- Get All loggedin Users wishes -->
+	 $.ajax({
+        url: '/getAllWishes',
+        type: 'GET',
+        success: function(response) {
+            var data = JSON.parse(response);
+			
+			var itemsPerRow =0;
+			var div = $('<div>').attr('class','row');
+			for(var i=0 ; i< data.length;i++)
+			{
+			   if(i== data.length-1)
+			   {
+				 // alert("First If");
+				  div.append(createThumb1(data[i].Id,data[i].Title,data[i].Description,data[i].FilePath,data[i].Like,data[i].HasLiked));
+				  $('.LoggedInUserWishList').append(div);
+			   }
+				else
+				{
+			        
+					if( itemsPerRow < 6)
+					{// alert("First else");
+					  div.append(createThumb1(data[i].Id,data[i].Title,data[i].Description,data[i].FilePath,data[i].Like,data[i].HasLiked));
+					  itemsPerRow++;
+					}
+					else
+					{
+					 // alert("Second else");
+					  $('.LoggedInUserWishList').append(div);
+					  div = $('<div>').attr('class','row');
+					  div.append(createThumb1(data[i].Id,data[i].Title,data[i].Description,data[i].FilePath,data[i].Like,data[i].HasLiked));
+					  itemsPerRow =0;
+					}					
+			   
+                 } 				
+				
+			}
+			//console.log(response);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+	
+	
+	
+	 
+})
+
+function LoadAllUsers()
+{
+  <!-- Get All Users -->
+	$.ajax({
+        url: '/getAllUsers',
+        type: 'GET',
+        success: function(response) {
+            
+			var data = JSON.parse(response);
+			var _userid = {{userid}};
+			//alert({{username}});	
+			var _username = "{{username}}";			
+			
+			//$("#title").text(localStorage.getItem('loggedInUsername'));
+			$("#pnltitle").text(_username  + "'s " + "Wishes");
+			var itemsPerRow =0;
+			var div = $('<div>').attr('class','row');
+			
+			for(var i=0 ; i< data.length;i++)
+			{
+			  
+				if (itemsPerRow < 6)
+				{					   
+					if (i == data.length - 1) {
+						div.append(createThumb(data[i].Id,data[i].UserName,data[i].UserPhoto));
+						$('.well').append(div);
+					} else {
+						div.append(createThumb(data[i].Id,data[i].UserName,data[i].UserPhoto));
+						itemsPerRow++;
+					}
+				} else {
+						$('.well').append(div);
+						div = $('<div>').attr('class', 'row');
+						div.append(createThumb(data[i].Id,data[i].UserName,data[i].UserPhoto));
+						if (i == data.length - 1) {
+							$('.well').append(div);
+						}
+						itemsPerRow = 1;
+				}			  
+		    }
+			
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+<!-- Creating thumbnail dynamically -->
+function createThumb(id,name,photopath)
+{
+  if(photopath === null || photopath === '')
+  {
+    photopath = "static/UserPhoto/default.jpg";
+  }
+ var mainDiv1 = $('<div>').attr('class', 'col-sm-2 col-md-2');
+ var thumbnail1 = $('<div>').attr('class','thumbnail');
+ var img1 = $('<img>').attr({'id': 'btnUser_' + id,'class':'img-circle','src': photopath, 'data-holder-rendered':true,'style':"height:150px;width:150px;display:block"});
+ var captn1 = $('<div>').attr('class','caption');
+ var name = $('<h3>').text(name);
+  
+     <!-- var name1 = $('<button>').attr({'id': 'btn_' + id,'type':'button', 'class':'btn btn-danger btn-lg','value':name}); -->
+   captn1.append(name); 
+  <!-- captn1.append(name1);   -->
+  thumbnail1.append(img1)
+   thumbnail1.append(captn1)
+  mainDiv1.append(thumbnail1);
+  
+  return mainDiv1
+}
+  <!-- Click on User -->
+  $(document).on('click', '[id^="btnUser_"]', function() {
+    
+	var spId = $(this).attr('id').split('_')[1];
+	
+	$.ajax({
+        url: '/getAllWishesByUser',
+		method:'POST',
+        data: {
+            id1: spId
+            
+        },
+		
+        success: function(response,status) {
+           
+			var data = JSON.parse(response);
+			
+			
+			if(data.length > 0)
+			{
+			
+			var itemsPerRow =0;
+			var div = $('<div>').attr('class','row');
+			for(var i=0 ; i< data.length;i++)
+			{
+			   if(i== data.length-1)
+			   {
+				 
+				  div.append(createThumb1(data[i].Id,data[i].Title,data[i].Description,data[i].FilePath,data[i].Like,data[i].HasLiked));
+				  $('.modal-body').append(div);
+			   }
+				else
+				{
+			        
+					if( itemsPerRow < 3)
+					{
+					  div.append(createThumb1(data[i].Id,data[i].Title,data[i].Description,data[i].FilePath,data[i].Like,data[i].HasLiked));
+					  itemsPerRow++;
+					}
+					else
+					{
+					 
+					  $('.modal-body').append(div);
+					  div = $('<div>').attr('class','row');
+					  div.append(createThumb1(data[i].Id,data[i].Title,data[i].Description,data[i].FilePath,data[i].Like,data[i].HasLiked));
+					  itemsPerRow =0;
+					}					
+			   
+                 } 				
+				
+			}
+			// Trigger the Pop Up
+            $('#wishModal').modal();
+		}
+			else
+			{
+			   alert("No wishes found for selected User");
+			}
+			 
+			
+			
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+	
+	
+	
+});
+
+<!-- Creating thumbnail dynamically -->
+function createThumb1(id,title,desc,filepath,like,hasLiked)
+{
+ var mainDiv = $('<div>').attr('class', 'col-sm-4 col-md-4');
+ var thumbnail = $('<div>').attr('class','thumbnail');
+ var img = $('<img>').attr({'src': filepath, 'data-holder-rendered':true,'style':"height:150px;width:150px;display:block"});
+ var captn = $('<div>').attr('class','caption');
+  var title = $('<h3>').text(title);
+  var desc = $('<p>').text(desc);
+  var  para = $('<p>')
+   var btn = $('<button>').attr({'id': 'btn_' + id,'type':'button', 'class':'btn btn-danger btn-sm'});
+     var spn= $('<span>').attr({'class':'glyphicon glyphicon-thumbs-up','aria-hidden':true});
+	
+	 var likeSpan = $('<span>').attr({'aria-hidden':true,'id':'span_'+id});
+	 if (hasLiked == "1") {
+          likeSpan.html('&nbsp;You & ' + (Number(like) - 1) + ' Others');
+		  
+     } else {
+          likeSpan.html('&nbsp;' + like + ' like(s)');
+		  
+     }
+     
+  para.append(btn.append(spn));
+  para.append(likeSpan);
+  captn.append(title,desc,para);
+  captn.append(desc);
+  captn.append(para);
+  thumbnail.append(img)
+   thumbnail.append(captn)
+  mainDiv.append(thumbnail);
+  
+  return mainDiv
+}
+
+
+<!-- Click on Like button-->
+$(document).on('click', '[id^="btn_"]', function() {
+    
+	var spId = $(this).attr('id').split('_')[1];
+	$.ajax({
+        url: '/addUpdateLike',
+        method: 'POST',
+        data: {
+            wish: $(this).attr('id').split('_')[1],
+            like: 1
+        },
+        success: function(response) {
+            var obj = JSON.parse(response);
+			 if (obj.likeStatus == "1") {
+                      $('#span_' + spId).html('&nbsp;You & ' + (Number(obj.total) - 1) + ' Others');
+             } else {
+                      $('#span_' + spId).html('&nbsp;' + obj.total + ' like(s)');
+                    }
+			  
+			console.log(response);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+});
+
+<!-- Editing User Profile  -->
+function Edit() {
+    //Populate the Pop up
+           $('#inputName').val("{{username}}");
+           $('#inputEmail').val("{{user_username}}");
+		   $('#inputPassword').val("{{pwd}}");		   
+		   $('#imgUpload').attr('src',"{{userphoto}}");
+		   //alert(data[0]['FilePath'])
+		   //alert(data[0]['Private'])
+          
+            // Trigger the Pop Up
+            $('#aboutMeModal').modal();
+}
+
+
+
+
+
+</script> 
+ <style>
+  body {
+  font-size: 3;
+  font-family:"Comic sans MS";
+  font-style:"italic";
+  font-weight:"bold";
+   }
+   
+    .btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+         
+        .btn-file input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: inherit;
+            display: block;
+        }
+</style> 
+ 
+</head>
+ 
+<body onload="LoadAllUsers()">
+ 
+     <nav class="navbar navbar-expand-sm navbar-inverse">
+		  <div class="container-fluid">
+			<div class="navbar-header" >
+			  <a class="navbar-brand" href="#">
+			<div  class="row">
+					<div class ="col-md-3"><img src="../static/images/BucketList.png" style="width:30px;" class="img-circle" /></div>
+					
+					<div class ="col-md-9">Bucket List</div>
+				</div> 
+</a>
+</div>				
+                <ul class="nav navbar-nav navbar-right">
+                    <li role="presentation" class="active"><a href="#">Dashboard</a></li>
+					<li role="presentation" ><a role="button" onclick="Edit()"> About me</a></li>
+                    <li role="presentation"><a href="/userHome">Wish List</a></li>
+                    <li role="presentation"><a href="/showAddwish">Add Wish</a></li>
+                    <li role="presentation"><a href="/logout">Logout</a></li>
+                </ul>
+           </div>
+     </nav>
+	 <div class="panel-group">
+	  <!-- Display All loggedin Users wishes -->
+      <div class="panel panel-primary">
+      <div id="pnltitle"  class ="panel-heading"></div> 
+     <div class="panel-body">
+      
+         <div class="LoggedInUserWishList">  </div>
+     </div>
+  </div>	 
+		<!-- Display All  Users -->
+      <div class="panel panel-primary">
+   <div   class ="panel-heading">Users </div> 
+     <div class="panel-body">		
+	    <div class="well">                          
+         
+        </div>
+	 </div>
+  </div>
+    </div>  
+		<!-- <button onclick="window.open('http://www.google.com','name','width=200,height=200');">Open</button> -->
+		
+	<!-- Pop Up - Wish list of selected User -->	
+  <div class="modal fade" id="wishModal" tabindex="-1" role="dialog" aria-labelledby="wishModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+       
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="wishModalLabel">Wishes</h4>
+            </div>
+            <div class="modal-body">
+			
+			</div>
+		</div>
+			
+	</div>
+  </div>		
+		
+		<!-- About me modal  -->
+		
+		<div class="modal fade" id="aboutMeModal" tabindex="-1" role="dialog" aria-labelledby="aboutMeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+       
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="aboutMeModalLabel">User Profile</h4>
+            </div>
+            <div class="modal-body">
+			   <form class="form-signin">
+					<label for="inputName" class="sr-only">Name</label>
+					<input type="name" name="inputName" id="inputName" class="form-control" placeholder="Name" required autofocus>
+					<label for="inputEmail" class="sr-only">Email address</label>
+					<input type="email" name="inputEmail" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+					<label for="inputPassword" class="sr-only">Password</label>
+					<input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Password" readonly>
+					 
+                    <!-- File upload -->
+					<div class="form-group">
+                        <label for="txtPost">Photos</label>
+ 
+						<div class="input-group">
+							<span class="input-group-btn">
+							  <span class="btn btn-primary btn-file">
+								Browse&hellip; <input type="file" id="fileupload" name="file" multiple>
+							  </span>
+							</span>
+							<!-- <input type="text" class="form-control" readonly> -->
+						    <div class="pull-right">
+                             <img id="imgUpload" style="width: 140px; height: 140px;" class="img-thumbnail" >
+							 <input type="hidden" name="filePath" id="filePath"></input>
+                             </div>
+						</div>
+ 
+                    </div>
+		
+		
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<button id="btnUserAccount" class="btn  btn-primary " type="button">Update</button>
+		  </div>
+      </form>
+			</div>
+		</div>
+			
+	</div>
+  </div>
+		
+		<footer class="footer">
+                <p>&copy; DreamCompany 2019</p>
+        </footer>
+	</div>
+</body>
+ 
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Python Flask Bucket List App</title>
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">-->
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+ 
+    <link href="https://getbootstrap.com/docs/3.3/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/signup.css" rel="stylesheet">
+   <script type="text/javascript" src ="../static/js/jquery-3.3.1.js"></script>
+  <script type="text/javascript" src ="../static/js/jquerysession.js"></script>
+<script type="text/javascript">
+   $(function(){
+
+	$('#btnSignIn').click(function(){
+
+         
+	$.ajax({
+
+	url: '/validateLogin',
+	data: $('form').serialize(),
+
+	type: 'POST',
+
+	success: function(response){
+             <!-- $.session.set(‘userid’, response.); -->
+			console.log(response);
+
+			},
+
+	error: function(error){
+	
+			console.log(error);
+
+			}
+
+});
+});
+});
+
+
+
+</script>
+<style>
+body {
+  font-size: 3;
+  font-family:"Comic sans MS";
+  font-style:"italic";
+  font-weight:"bold";
+   }
+   
+   </style>
+  </head>
+ 
+  <body>     
+	  
+	   <nav class="navbar navbar-expand-sm navbar-inverse">
+		  <div class="container-fluid">
+			<div class="navbar-header" >
+			  <a class="navbar-brand" href="#">
+			    <div  class="row">
+					<div class ="col-md-3"><img src="../static/images/BucketList.png" style="width:30px;" class="img-circle" /></div>
+					
+					<div class ="col-md-9">Bucket List</div>
+				</div> 
+			  </a>
+			</div>				
+                <ul class="nav navbar-nav navbar-right">
+                 
+                    <li role="presentation"><a href="/">Home</a></li>
+                    <li role="presentation"class="active"><a href="#">Sign In</a></li>
+                    <li role="presentation"><a href="/showSignUp">Sign Up</a></li>
+                </ul>
+           </div>
+		   </div>
+       </nav>
+	 
+        <div class="jumbotron row"> 
+         
+		    
+            <div class="col-sm-6">
+			    <h3>Log In</h3>
+				<form class="form-signin" action="/validateLogin" method="post" > 
+					 
+					<label for="inputEmail" >Email address*</label>
+					<input type="email" name="inputEmail" id="inputEmail" class="form-control" value="meetvijya@gmail.com" placeholder="Email address" required autofocus />
+					<label for="inputPassword" >Password*</label>
+					<input type="password" name="inputPassword" id="inputPassword" value="1234" class="form-control" placeholder="Password" required />
+					 
+					<button id="btnSignIn" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+				</form>
+			
+	        </div>
+			<div class="col-sm-6">           
+				
+				<p class="txt-muted"> Start Living your dream !</p>
+				<p><a class="btn btn-lg btn-success"  href="showSignUp" role="button"><font face = "Comic sans MS" size =" 5" >Join Now !</font></a>
+				</p>
+			</div>
+		
+         
+        </div>
+
+ 
+      <footer class="footer">
+        <p>&copy; DreamCompany 2019</p>
+      </footer>
+ 
+    
+  </body>
+</html>

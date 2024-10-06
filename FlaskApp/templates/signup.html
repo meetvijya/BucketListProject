@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Python Flask Bucket List App</title>
+ 
+     
+   <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">-->
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+ 
+    <link href="https://getbootstrap.com/docs/3.3/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/signup.css" rel="stylesheet">
+   <script type="text/javascript" src ="../static/js/jquery-3.3.1.js"></script>
+
+     <script src="../static/js/jquery.ui.widget.js"></script>
+ 
+	<script type="text/javascript" src="../static/js/jquery.fileupload.js"></script>
+	 
+	<script type="text/javascript" src="../static/js/jquery.fileupload-process.js"></script>
+	 
+	<script type="text/javascript" src="../static/js/jquery.fileupload-ui.js"></script>
+ <script type="text/javascript">
+  $(function() {
+    $('#btnSignUp').click(function() {
+ 
+        $.ajax({
+            url: '/signUp',
+            data: $('form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+	
+	$('#fileupload').fileupload({
+	    url:'uploadUserPhoto',
+	    dataType:'json',
+	    add: function(e,data){
+	         data.submit();},
+		success:function(response,status){
+		         console.log(response.filename);
+				 var filePath = 'static/UserPhoto/' + response.filename;
+					$('#imgUpload').attr('src',filePath);
+					$('#filePath').val(filePath);					
+			        console.log('success');
+			        }
+                 
+				 ,
+		error:function(error){
+				console.log(error);}
+        });
+	
+});
+</script>
+  
+  <style>
+  body {
+  font-size: 3;
+  font-family:"Comic sans MS";
+  font-style:"italic";
+  font-weight:"bold";
+   }
+   
+   .btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+         
+        .btn-file input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: inherit;
+            display: block;
+        }
+  </style>
+  </head>
+ 
+  <body>
+ 
+    
+     	  
+	  <nav class="navbar navbar-expand-sm navbar-inverse">
+		  <div class="container-fluid">
+			<div class="navbar-header" >
+			  <a class="navbar-brand" href="#">
+			    <div  class="row">
+					<div class ="col-md-3"><img src="../static/images/BucketList.png" style="width:30px;" class="img-circle" /></div>
+					
+					<div class ="col-md-9">Bucket List</div>
+				</div> 
+			  </a>
+			</div>				
+                <ul class="nav navbar-nav navbar-right">
+                 
+                    <li role="presentation" ><a href="/">Home</a></li>
+            <li role="presentation"><a href="showSignin">Sign In</a></li>
+            <li role="presentation" class="active"><a href="#">Sign Up</a></li>
+                </ul>
+           </div>
+		   </div>
+       </nav>
+	  
+ 
+      <div class="jumbotron">
+        <h1>Get started on your Bucket List</h1>
+        <form class="form-signin">
+        <label for="inputName" class="sr-only">Name</label>
+        <input type="name" name="inputName" id="inputName" class="form-control" placeholder="Name" required autofocus>
+        <label for="inputEmail" class="sr-only">Email address</label>
+        <input type="email" name="inputEmail" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Password" required>
+         
+        <!-- File upload -->
+					<div class="form-group">
+                        <label for="txtPost">Photos</label>
+ 
+						<div class="input-group">
+							<span class="input-group-btn">
+							  <span class="btn btn-primary btn-file">
+								Browse&hellip; <input type="file" id="fileupload" name="file" multiple>
+							  </span>
+							</span>
+							<!-- <input type="text" class="form-control" readonly> -->
+						    <div class="pull-right">
+                             <img id="imgUpload" style="width: 140px; height: 140px;" class="img-thumbnail" >
+							 <input type="hidden" name="filePath" id="filePath"></input>
+                             </div>
+						</div>
+ 
+                    </div>
+		
+		
+		
+		<button id="btnSignUp" class="btn btn-lg btn-primary btn-block" type="button">Sign up</button>
+      </form>
+      </div>
+ 
+       
+ 
+      <footer class="footer">
+        <p>&copy; DreamCompany 2019</p>
+      </footer>
+ 
+    
+  </body>
+</html>
